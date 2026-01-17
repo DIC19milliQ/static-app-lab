@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Static App Lab: LocalDB Studio</title>
+  <title>Static App Lab</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="manifest" href="pwa/manifest.json" />
 </head>
 <body>
   <header class="app-header">
     <div>
-      <h1>Static App Lab: LocalDB Studio</h1>
-      <p class="subtitle">Offline-first personal database — no backend, no dependencies.</p>
+      <h1>Static App Lab</h1>
+      <p class="subtitle">A no-backend playground for local data, media, and offline experiments.</p>
     </div>
     <div id="sw-update" class="banner hidden">
       <span>New version available.</span>
@@ -19,227 +19,460 @@
     </div>
   </header>
 
-  <nav class="tabs" role="tablist">
-    <button class="tab active" data-tab="list" role="tab">List</button>
-    <button class="tab" data-tab="editor" role="tab">Editor</button>
-    <button class="tab" data-tab="import-export" role="tab">Import-Export</button>
-    <button class="tab" data-tab="dashboard" role="tab">Dashboard</button>
-    <button class="tab" data-tab="settings" role="tab">Settings</button>
+  <nav class="tabs" role="tablist" aria-label="Static App Lab">
+    <button class="tab active" data-tab="local-db" data-tab-group="main" role="tab">Local DB</button>
+    <button class="tab" data-tab="data-viewer" data-tab-group="main" role="tab">Data Viewer</button>
+    <button class="tab" data-tab="media-lab" data-tab-group="main" role="tab">Media Lab</button>
+    <button class="tab" data-tab="calculator-lab" data-tab-group="main" role="tab">Calculator Lab</button>
+    <button class="tab" data-tab="offline-lab" data-tab-group="main" role="tab">Offline/PWA</button>
   </nav>
 
   <main>
-    <section id="tab-list" class="tab-panel active" role="tabpanel">
-      <div class="panel grid">
-        <div class="controls">
-          <label>
-            Search
-            <input id="search-input" type="search" placeholder="Search title or body" />
-          </label>
-          <label>
-            Status
-            <select id="status-filter">
-              <option value="all">All</option>
-              <option value="active">Active</option>
-              <option value="archived">Archived</option>
-            </select>
-          </label>
-          <label>
-            Tag
-            <select id="tag-filter">
-              <option value="">All tags</option>
-            </select>
-          </label>
-          <label>
-            Min rating
-            <select id="rating-filter">
-              <option value="0">0+</option>
-              <option value="1">1+</option>
-              <option value="2">2+</option>
-              <option value="3">3+</option>
-              <option value="4">4+</option>
-              <option value="5">5</option>
-            </select>
-          </label>
-          <label>
-            Sort
-            <select id="sort-filter">
-              <option value="updated-desc">Updated (newest)</option>
-              <option value="updated-asc">Updated (oldest)</option>
-              <option value="created-desc">Created (newest)</option>
-              <option value="created-asc">Created (oldest)</option>
-              <option value="title-asc">Title A-Z</option>
-              <option value="title-desc">Title Z-A</option>
-            </select>
-          </label>
-        </div>
-
-        <div class="list-area">
-          <div class="list-header">
-            <div>
-              <strong id="list-count">0</strong> records
-              <span id="list-indicator" class="indicator hidden">Virtualized list active for 10,000+ records</span>
-            </div>
-            <button id="new-record" class="btn primary">New Record</button>
-          </div>
-          <div id="list-virtual-scroll" class="virtual-scroll">
-            <div class="virtual-spacer"></div>
-            <ul id="record-list" class="record-list"></ul>
-          </div>
-        </div>
-
-        <div class="detail-panel" id="detail-panel">
-          <div class="detail-empty">Select a record to see details.</div>
-          <div class="detail-content hidden">
-            <h3 id="detail-title"></h3>
-            <p id="detail-body"></p>
-            <div class="chips" id="detail-tags"></div>
-            <div class="detail-meta">
-              <span id="detail-status"></span>
-              <span id="detail-rating"></span>
-            </div>
-            <div class="detail-meta">
-              <span id="detail-created"></span>
-              <span id="detail-updated"></span>
-            </div>
-            <div class="detail-actions">
-              <button id="detail-edit" class="btn">Edit</button>
-              <button id="detail-duplicate" class="btn">Duplicate</button>
-              <button id="detail-archive" class="btn">Archive</button>
-              <button id="detail-delete" class="btn danger">Delete</button>
-            </div>
-          </div>
-        </div>
+    <section id="tab-local-db" class="tab-panel active" data-tab-group="main" role="tabpanel">
+      <div class="lab-header">
+        <h2>Local DB Lab</h2>
+        <p class="muted">IndexedDB-powered CRUD with search, filters, imports, exports, and offline storage.</p>
       </div>
-    </section>
+      <nav class="tabs sub-tabs" role="tablist" aria-label="Local DB tabs">
+        <button class="tab active" data-tab="list" data-tab-group="localdb" role="tab">List</button>
+        <button class="tab" data-tab="editor" data-tab-group="localdb" role="tab">Editor</button>
+        <button class="tab" data-tab="import-export" data-tab-group="localdb" role="tab">Import-Export</button>
+        <button class="tab" data-tab="dashboard" data-tab-group="localdb" role="tab">Dashboard</button>
+        <button class="tab" data-tab="settings" data-tab-group="localdb" role="tab">Settings</button>
+      </nav>
 
-    <section id="tab-editor" class="tab-panel" role="tabpanel">
-      <div class="panel">
-        <div class="editor-header">
-          <div>
-            <h2 id="editor-title">Create Record</h2>
-            <p class="muted">Manage record fields and save to IndexedDB.</p>
-          </div>
-          <label class="switch">
-            <input id="autosave-toggle" type="checkbox" />
-            <span>Autosave</span>
-          </label>
-        </div>
-        <form id="editor-form" class="form">
-          <input type="hidden" id="record-id" />
-          <label>
-            Title <span class="required">*</span>
-            <input id="record-title" type="text" required />
-          </label>
-          <label>
-            Body
-            <textarea id="record-body" rows="6" placeholder="Notes, ideas, or content"></textarea>
-          </label>
-          <label>
-            Tags (comma-separated)
-            <input id="record-tags" type="text" placeholder="work, personal, research" />
-          </label>
-          <div class="form-grid">
+      <section id="tab-localdb-list" class="tab-panel active" data-tab-group="localdb" role="tabpanel">
+        <div class="panel grid">
+          <div class="controls">
+            <label>
+              Search
+              <input id="search-input" type="search" placeholder="Search title or body" />
+            </label>
             <label>
               Status
-              <select id="record-status">
+              <select id="status-filter">
+                <option value="all">All</option>
                 <option value="active">Active</option>
                 <option value="archived">Archived</option>
               </select>
             </label>
             <label>
-              Rating
-              <input id="record-rating" type="range" min="0" max="5" value="3" />
-              <span id="rating-value" class="muted"></span>
-            </label>
-          </div>
-          <div class="form-actions">
-            <button id="save-record" class="btn primary" type="submit">Save</button>
-            <span id="save-status" class="muted"></span>
-          </div>
-        </form>
-      </div>
-    </section>
-
-    <section id="tab-import-export" class="tab-panel" role="tabpanel">
-      <div class="panel import-grid">
-        <div>
-          <h2>Export</h2>
-          <p class="muted">Backup your data as JSON or CSV.</p>
-          <button id="export-json" class="btn">Export JSON</button>
-          <button id="export-csv" class="btn">Export CSV</button>
-        </div>
-        <div>
-          <h2>Import</h2>
-          <p class="muted">Merge or replace records from a JSON or CSV file.</p>
-          <div class="import-controls">
-            <input id="import-file" type="file" accept=".json,.csv" />
-            <label>
-              Mode
-              <select id="import-mode">
-                <option value="merge">Merge by ID</option>
-                <option value="replace">Replace all</option>
+              Tag
+              <select id="tag-filter">
+                <option value="">All tags</option>
               </select>
             </label>
-            <button id="preview-import" class="btn">Preview</button>
-            <button id="commit-import" class="btn primary" disabled>Import</button>
+            <label>
+              Min rating
+              <select id="rating-filter">
+                <option value="0">0+</option>
+                <option value="1">1+</option>
+                <option value="2">2+</option>
+                <option value="3">3+</option>
+                <option value="4">4+</option>
+                <option value="5">5</option>
+              </select>
+            </label>
+            <label>
+              Sort
+              <select id="sort-filter">
+                <option value="updated-desc">Updated (newest)</option>
+                <option value="updated-asc">Updated (oldest)</option>
+                <option value="created-desc">Created (newest)</option>
+                <option value="created-asc">Created (oldest)</option>
+                <option value="title-asc">Title A-Z</option>
+                <option value="title-desc">Title Z-A</option>
+              </select>
+            </label>
           </div>
-          <p id="import-preview" class="muted"></p>
-          <p class="notice">
-            Reminder: Browser storage can be cleared by the user or system. Regular exports are your backup.
-          </p>
+
+          <div class="list-area">
+            <div class="list-header">
+              <div>
+                <strong id="list-count">0</strong> records
+                <span id="list-indicator" class="indicator hidden">Virtualized list active for 10,000+ records</span>
+              </div>
+              <button id="new-record" class="btn primary">New Record</button>
+            </div>
+            <div id="list-virtual-scroll" class="virtual-scroll">
+              <div class="virtual-spacer"></div>
+              <ul id="record-list" class="record-list"></ul>
+            </div>
+          </div>
+
+          <div class="detail-panel" id="detail-panel">
+            <div class="detail-empty">Select a record to see details.</div>
+            <div class="detail-content hidden">
+              <h3 id="detail-title"></h3>
+              <p id="detail-body"></p>
+              <div class="chips" id="detail-tags"></div>
+              <div class="detail-meta">
+                <span id="detail-status"></span>
+                <span id="detail-rating"></span>
+              </div>
+              <div class="detail-meta">
+                <span id="detail-created"></span>
+                <span id="detail-updated"></span>
+              </div>
+              <div class="detail-actions">
+                <button id="detail-edit" class="btn">Edit</button>
+                <button id="detail-duplicate" class="btn">Duplicate</button>
+                <button id="detail-archive" class="btn">Archive</button>
+                <button id="detail-delete" class="btn danger">Delete</button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
+
+      <section id="tab-localdb-editor" class="tab-panel" data-tab-group="localdb" role="tabpanel">
+        <div class="panel">
+          <div class="editor-header">
+            <div>
+              <h2 id="editor-title">Create Record</h2>
+              <p class="muted">Manage record fields and save to IndexedDB.</p>
+            </div>
+            <label class="switch">
+              <input id="autosave-toggle" type="checkbox" />
+              <span>Autosave</span>
+            </label>
+          </div>
+          <form id="editor-form" class="form">
+            <input type="hidden" id="record-id" />
+            <label>
+              Title <span class="required">*</span>
+              <input id="record-title" type="text" required />
+            </label>
+            <label>
+              Body
+              <textarea id="record-body" rows="6" placeholder="Notes, ideas, or content"></textarea>
+            </label>
+            <label>
+              Tags (comma-separated)
+              <input id="record-tags" type="text" placeholder="work, personal, research" />
+            </label>
+            <div class="form-grid">
+              <label>
+                Status
+                <select id="record-status">
+                  <option value="active">Active</option>
+                  <option value="archived">Archived</option>
+                </select>
+              </label>
+              <label>
+                Rating
+                <input id="record-rating" type="range" min="0" max="5" value="3" />
+                <span id="rating-value" class="muted"></span>
+              </label>
+            </div>
+            <div class="form-actions">
+              <button id="save-record" class="btn primary" type="submit">Save</button>
+              <span id="save-status" class="muted"></span>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section id="tab-localdb-import-export" class="tab-panel" data-tab-group="localdb" role="tabpanel">
+        <div class="panel import-grid">
+          <div>
+            <h2>Export</h2>
+            <p class="muted">Backup your data as JSON or CSV.</p>
+            <button id="export-json" class="btn">Export JSON</button>
+            <button id="export-csv" class="btn">Export CSV</button>
+          </div>
+          <div>
+            <h2>Import</h2>
+            <p class="muted">Merge or replace records from a JSON or CSV file.</p>
+            <div class="import-controls">
+              <input id="import-file" type="file" accept=".json,.csv" />
+              <label>
+                Mode
+                <select id="import-mode">
+                  <option value="merge">Merge by ID</option>
+                  <option value="replace">Replace all</option>
+                </select>
+              </label>
+              <button id="preview-import" class="btn">Preview</button>
+              <button id="commit-import" class="btn primary" disabled>Import</button>
+            </div>
+            <p id="import-preview" class="muted"></p>
+            <p class="notice">
+              Reminder: Browser storage can be cleared by the user or system. Regular exports are your backup.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-localdb-dashboard" class="tab-panel" data-tab-group="localdb" role="tabpanel">
+        <div class="panel">
+          <h2>Dashboard</h2>
+          <div class="dashboard-grid">
+            <div class="card">
+              <h3>Totals</h3>
+              <p id="dash-total"></p>
+              <p id="dash-active"></p>
+              <p id="dash-archived"></p>
+            </div>
+            <div class="card">
+              <h3>Top Tags</h3>
+              <ul id="dash-tags" class="stack"></ul>
+            </div>
+            <div class="card">
+              <h3>Rating Distribution</h3>
+              <ul id="dash-ratings" class="stack"></ul>
+            </div>
+            <div class="card">
+              <h3>Recently Updated</h3>
+              <ul id="dash-recent" class="stack"></ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-localdb-settings" class="tab-panel" data-tab-group="localdb" role="tabpanel">
+        <div class="panel settings-grid">
+          <div>
+            <h2>Sample Data</h2>
+            <p class="muted">Generate realistic sample records without freezing the UI.</p>
+            <div class="button-row">
+              <button id="generate-100" class="btn">Generate 100</button>
+              <button id="generate-10000" class="btn">Generate 10,000</button>
+            </div>
+          </div>
+          <div>
+            <h2>Maintenance</h2>
+            <button id="reset-demo" class="btn">Reset demo</button>
+            <button id="clear-data" class="btn danger">Clear all data</button>
+            <div class="storage-info">
+              <p id="storage-count"></p>
+              <p id="storage-size"></p>
+            </div>
+          </div>
+        </div>
+      </section>
     </section>
 
-    <section id="tab-dashboard" class="tab-panel" role="tabpanel">
+    <section id="tab-data-viewer" class="tab-panel" data-tab-group="main" role="tabpanel">
       <div class="panel">
-        <h2>Dashboard</h2>
-        <div class="dashboard-grid">
-          <div class="card">
-            <h3>Totals</h3>
-            <p id="dash-total"></p>
-            <p id="dash-active"></p>
-            <p id="dash-archived"></p>
+        <div class="lab-header">
+          <h2>Data Viewer</h2>
+          <p class="muted">Drop in CSV or JSON data and explore it instantly. Data stays in your browser; nothing is uploaded.</p>
+        </div>
+        <div class="data-viewer-grid">
+          <div>
+            <div id="data-dropzone" class="dropzone">
+              <strong>Drag & drop CSV or JSON files</strong>
+              <span class="muted">or choose a file below</span>
+            </div>
+            <input id="data-file" type="file" accept=".csv,.json" />
+            <div class="button-row">
+              <button id="data-export-json" class="btn">Export JSON</button>
+              <button id="data-export-csv" class="btn">Export CSV</button>
+            </div>
           </div>
-          <div class="card">
-            <h3>Top Tags</h3>
-            <ul id="dash-tags" class="stack"></ul>
+          <div>
+            <label>
+              Keyword filter
+              <input id="data-filter" type="search" placeholder="Search visible columns" />
+            </label>
+            <div class="control-group">
+              <h3>Visible columns</h3>
+              <div id="data-columns" class="checkbox-grid"></div>
+            </div>
+            <p id="data-row-count" class="muted"></p>
           </div>
-          <div class="card">
-            <h3>Rating Distribution</h3>
-            <ul id="dash-ratings" class="stack"></ul>
-          </div>
-          <div class="card">
-            <h3>Recently Updated</h3>
-            <ul id="dash-recent" class="stack"></ul>
-          </div>
+        </div>
+        <p id="data-empty" class="muted"></p>
+        <div class="table-wrapper">
+          <table id="data-table" class="data-table">
+            <thead></thead>
+            <tbody></tbody>
+          </table>
         </div>
       </div>
     </section>
 
-    <section id="tab-settings" class="tab-panel" role="tabpanel">
-      <div class="panel settings-grid">
-        <div>
-          <h2>Sample Data</h2>
-          <p class="muted">Generate realistic sample records without freezing the UI.</p>
-          <div class="button-row">
-            <button id="generate-100" class="btn">Generate 100</button>
-            <button id="generate-10000" class="btn">Generate 10,000</button>
+    <section id="tab-media-lab" class="tab-panel" data-tab-group="main" role="tabpanel">
+      <div class="panel">
+        <div class="lab-header">
+          <h2>Media Lab</h2>
+          <p class="muted">Edit images directly in the browser, then export them without uploading.</p>
+        </div>
+        <div class="media-grid">
+          <div>
+            <div id="media-dropzone" class="dropzone">
+              <strong>Drop PNG, JPG, or WebP</strong>
+              <span class="muted">or pick a file below</span>
+            </div>
+            <input id="media-file" type="file" accept="image/png,image/jpeg,image/webp" />
+            <canvas id="media-canvas" class="media-canvas"></canvas>
+            <p id="media-info" class="muted"></p>
+          </div>
+          <div class="media-controls">
+            <div class="control-group">
+              <h3>Rotate & flip</h3>
+              <div class="button-row">
+                <button id="rotate-left" class="btn">Rotate 90° Left</button>
+                <button id="rotate-right" class="btn">Rotate 90° Right</button>
+                <button id="flip-horizontal" class="btn">Flip Horizontal</button>
+                <button id="flip-vertical" class="btn">Flip Vertical</button>
+              </div>
+            </div>
+            <div class="control-group">
+              <h3>Crop</h3>
+              <div class="form-grid">
+                <label>
+                  X
+                  <input id="crop-x" type="number" min="0" value="0" />
+                </label>
+                <label>
+                  Y
+                  <input id="crop-y" type="number" min="0" value="0" />
+                </label>
+                <label>
+                  Width
+                  <input id="crop-w" type="number" min="1" placeholder="Auto" />
+                </label>
+                <label>
+                  Height
+                  <input id="crop-h" type="number" min="1" placeholder="Auto" />
+                </label>
+              </div>
+              <button id="crop-apply" class="btn">Apply crop</button>
+            </div>
+            <div class="control-group">
+              <h3>Resize</h3>
+              <div class="form-grid">
+                <label>
+                  Width (px)
+                  <input id="resize-width" type="number" min="1" />
+                </label>
+                <label>
+                  Height (px)
+                  <input id="resize-height" type="number" min="1" />
+                </label>
+                <label class="checkbox inline">
+                  <input id="resize-lock" type="checkbox" checked />
+                  <span>Lock aspect ratio</span>
+                </label>
+              </div>
+              <button id="resize-apply" class="btn">Apply resize</button>
+            </div>
+            <div class="control-group">
+              <h3>Export</h3>
+              <label>
+                JPEG quality
+                <input id="jpeg-quality" type="range" min="40" max="100" value="90" />
+              </label>
+              <div class="button-row">
+                <button id="export-png" class="btn">Download PNG</button>
+                <button id="export-jpeg" class="btn">Download JPEG</button>
+              </div>
+            </div>
           </div>
         </div>
-        <div>
-          <h2>Maintenance</h2>
-          <button id="reset-demo" class="btn">Reset demo</button>
-          <button id="clear-data" class="btn danger">Clear all data</button>
-          <div class="storage-info">
-            <p id="storage-count"></p>
-            <p id="storage-size"></p>
+        <div class="pdf-panel">
+          <h3>PDF Preview (basic)</h3>
+          <input id="pdf-file" type="file" accept="application/pdf" />
+          <p id="pdf-note" class="muted">PDF advanced features require libraries/backends.</p>
+          <embed id="pdf-preview" type="application/pdf" class="pdf-preview hidden" />
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-calculator-lab" class="tab-panel" data-tab-group="main" role="tabpanel">
+      <div class="panel">
+        <div class="lab-header">
+          <h2>Calculator Lab</h2>
+          <p class="muted">Simulate savings growth with instant calculations and a lightweight chart.</p>
+        </div>
+        <div class="calculator-grid">
+          <form class="form">
+            <label>
+              Initial amount
+              <input id="calc-initial" type="number" min="0" value="5000" />
+            </label>
+            <label>
+              Monthly contribution
+              <input id="calc-monthly" type="number" min="0" value="250" />
+            </label>
+            <label>
+              Annual interest rate (%)
+              <input id="calc-rate" type="number" min="0" step="0.1" value="4" />
+            </label>
+            <label>
+              Years
+              <input id="calc-years" type="number" min="1" value="10" />
+            </label>
+          </form>
+          <div>
+            <div class="result-cards">
+              <div class="card">
+                <h3>Final amount</h3>
+                <p id="calc-final"></p>
+              </div>
+              <div class="card">
+                <h3>Total contributions</h3>
+                <p id="calc-contrib"></p>
+              </div>
+              <div class="card">
+                <h3>Total interest</h3>
+                <p id="calc-interest"></p>
+              </div>
+            </div>
+            <div class="chart-wrapper">
+              <h3>Year-by-year growth</h3>
+              <div id="calc-chart" class="bar-chart"></div>
+            </div>
           </div>
         </div>
-        <div>
-          <h2>PWA Status</h2>
-          <p id="pwa-status" class="muted"></p>
-          <p id="display-mode" class="muted"></p>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Year</th>
+                <th>Balance</th>
+                <th>Contributions</th>
+                <th>Interest earned</th>
+              </tr>
+            </thead>
+            <tbody id="calc-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-offline-lab" class="tab-panel" data-tab-group="main" role="tabpanel">
+      <div class="panel">
+        <div class="lab-header">
+          <h2>Offline/PWA Lab</h2>
+          <p class="muted">Understand how the Service Worker caches the app and how updates roll out.</p>
+        </div>
+        <div class="offline-grid">
+          <div>
+            <div class="status-list">
+              <p id="offline-sw-status"></p>
+              <p id="offline-cache-version"></p>
+              <p id="offline-display-mode"></p>
+              <p id="offline-last-updated"></p>
+              <p id="offline-update-status" class="muted"></p>
+            </div>
+            <div class="button-row">
+              <button id="offline-check-update" class="btn">Check for update</button>
+              <button id="offline-reload" class="btn primary hidden">Reload to update</button>
+            </div>
+          </div>
+          <div>
+            <h3>Offline test steps</h3>
+            <ol class="instruction-list">
+              <li>Load the app once while online.</li>
+              <li>Turn off your network connection.</li>
+              <li>Reload this page — it should still work.</li>
+              <li>Re-enable network and click “Check for update.”</li>
+            </ol>
+            <p class="muted">Tip: changes are applied after the new Service Worker installs and you reload.</p>
+          </div>
         </div>
       </div>
     </section>

@@ -1,6 +1,6 @@
 {
-  "name": "Static App Lab: LocalDB Studio",
-  "short_name": "LocalDB Studio",
+  "name": "Static App Lab",
+  "short_name": "Static App Lab",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f6f7fb",
