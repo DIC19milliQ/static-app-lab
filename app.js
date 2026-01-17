@@ -13,6 +13,10 @@ import { updateDashboard } from "./src/dashboard.js";
 import { initSettings } from "./src/settings.js";
 import { initImportExport } from "./src/import_export.js";
 import { nowIso, showToast, uniqueTags } from "./src/utils.js";
+import { initDataViewer } from "./src/data_viewer.js";
+import { initMediaLab } from "./src/media_lab.js";
+import { initCalculatorLab } from "./src/calculator_lab.js";
+import { initOfflineLab } from "./src/offline_lab.js";
 
 const toastEl = document.getElementById("toast");
 
@@ -27,6 +31,11 @@ const state = {
     sort: "updated-desc",
   },
   autosave: false,
+};
+
+const openLocalDbTab = (tabName) => {
+  document.querySelector('[data-tab-group="main"][data-tab="local-db"]')?.click();
+  document.querySelector(`[data-tab-group="localdb"][data-tab="${tabName}"]`)?.click();
 };
 
 const applyFilters = () => {
@@ -113,7 +122,7 @@ const listView = initList({
   onEdit: (id) => {
     const record = state.records.find((item) => item.id === id);
     editorView.setRecord(record);
-    document.querySelector('[data-tab="editor"]').click();
+    openLocalDbTab("editor");
   },
   onDuplicate: async (id) => {
     const record = state.records.find((item) => item.id === id);
@@ -143,7 +152,7 @@ const listView = initList({
   },
   onNew: () => {
     editorView.setRecord(createRecord());
-    document.querySelector('[data-tab="editor"]').click();
+    openLocalDbTab("editor");
   },
   onFilterChange: (filters) => {
     state.filters = { ...state.filters, ...filters };
@@ -196,14 +205,6 @@ const settingsView = initSettings({
     setRecords([...records, ...state.records]);
   },
   toastEl,
-  getPwaStatus: () => {
-    const registered = Boolean(navigator.serviceWorker?.controller);
-    let displayMode = "browser";
-    if (window.matchMedia("(display-mode: standalone)").matches) {
-      displayMode = "standalone";
-    }
-    return { registered, displayMode };
-  },
 });
 
 initTabs();
@@ -215,7 +216,7 @@ const loadData = async () => {
 };
 
 const registerServiceWorker = async () => {
-  if (!("serviceWorker" in navigator)) return;
+  if (!("serviceWorker" in navigator)) return null;
   const registration = await navigator.serviceWorker.register("./pwa/sw.js");
   if (registration.waiting) {
     showUpdateBanner(registration);
@@ -229,6 +230,7 @@ const registerServiceWorker = async () => {
       }
     });
   });
+  return registration;
 };
 
 const showUpdateBanner = (registration) => {
@@ -247,5 +249,9 @@ if ("serviceWorker" in navigator) {
 }
 
 await loadData();
-await registerServiceWorker();
+const registration = await registerServiceWorker();
+initDataViewer();
+initMediaLab();
+initCalculatorLab();
+initOfflineLab({ registration });
 refreshUI();

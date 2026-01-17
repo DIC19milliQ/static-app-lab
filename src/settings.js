@@ -7,7 +7,6 @@ export const initSettings = ({
   onReset,
   onGenerate,
   toastEl,
-  getPwaStatus,
 }) => {
   const generate100 = document.getElementById("generate-100");
   const generate10000 = document.getElementById("generate-10000");
@@ -15,8 +14,6 @@ export const initSettings = ({
   const resetDemo = document.getElementById("reset-demo");
   const storageCount = document.getElementById("storage-count");
   const storageSize = document.getElementById("storage-size");
-  const pwaStatus = document.getElementById("pwa-status");
-  const displayMode = document.getElementById("display-mode");
 
   const updateStorageInfo = () => {
     const records = getRecords();
@@ -24,11 +21,6 @@ export const initSettings = ({
     storageSize.textContent = `Approx. storage size: ${humanFileSize(estimateSize(records))}`;
   };
 
-  const updatePwaStatus = () => {
-    const status = getPwaStatus();
-    pwaStatus.textContent = `Service Worker: ${status.registered ? "Registered" : "Not registered"}`;
-    displayMode.textContent = `Display mode: ${status.displayMode}`;
-  };
 
   const handleGenerate = async (count) => {
     const records = generateSampleRecords(count);
@@ -49,7 +41,6 @@ export const initSettings = ({
   return {
     refresh() {
       updateStorageInfo();
-      updatePwaStatus();
     },
   };
 };

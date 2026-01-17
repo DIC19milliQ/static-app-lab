@@ -1,5 +1,5 @@
-const CACHE_VERSION = "v1";
-const CACHE_NAME = `localdb-studio-${CACHE_VERSION}`;
+const CACHE_VERSION = "v2";
+const CACHE_NAME = `static-app-lab-${CACHE_VERSION}`;
 const ASSETS = [
   "./",
   "./index.html",
@@ -14,6 +14,10 @@ const ASSETS = [
   "./src/settings.js",
   "./src/import_export.js",
   "./src/utils.js",
+  "./src/data_viewer.js",
+  "./src/media_lab.js",
+  "./src/calculator_lab.js",
+  "./src/offline_lab.js",
   "./pwa/manifest.json",
 ];
 
