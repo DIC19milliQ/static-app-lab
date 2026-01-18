@@ -1,3 +1,5 @@
+import { calculateSavingsGrowth } from "./calculator_math.js";
+
 const formatCurrency = (value) =>
   value.toLocaleString(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 2 });
 
@@ -18,33 +20,14 @@ export const initCalculatorLab = () => {
     const annualRate = Number(rateInput.value) || 0;
     const years = Math.max(1, Number(yearsInput.value) || 1);
 
-    const monthlyRate = annualRate / 100 / 12;
-    let balance = initial;
-    let totalContrib = initial;
-    let totalInterest = 0;
+    const { finalBalance, totalContrib, totalInterest, yearly } = calculateSavingsGrowth({
+      initial,
+      monthly,
+      annualRate,
+      years,
+    });
 
-    const yearly = [];
-
-    for (let year = 1; year <= years; year += 1) {
-      let yearContrib = 0;
-      let yearInterest = 0;
-      for (let month = 0; month < 12; month += 1) {
-        const interest = balance * monthlyRate;
-        balance += interest + monthly;
-        totalInterest += interest;
-        totalContrib += monthly;
-        yearContrib += monthly;
-        yearInterest += interest;
-      }
-      yearly.push({
-        year,
-        balance,
-        contributions: yearContrib,
-        interest: yearInterest,
-      });
-    }
-
-    finalOutput.textContent = formatCurrency(balance);
+    finalOutput.textContent = formatCurrency(finalBalance);
     contribOutput.textContent = formatCurrency(totalContrib);
     interestOutput.textContent = formatCurrency(totalInterest);
 
