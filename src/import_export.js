@@ -1,3 +1,4 @@
+import { serializeJson, validateJsonRecords } from "./data_helpers.js";
 import { csvParse, csvStringify, downloadFile, showToast } from "./utils.js";
 import { normalizeRecord } from "./model.js";
 
@@ -18,7 +19,7 @@ export const initImportExport = ({
   let previewRecords = [];
 
   exportJsonBtn.addEventListener("click", () => {
-    const data = JSON.stringify(getRecords(), null, 2);
+    const data = serializeJson(getRecords());
     downloadFile("localdb-export.json", data, "application/json");
     showToast(toastEl, "Exported JSON");
   });
@@ -61,7 +62,7 @@ export const initImportExport = ({
     const text = await file.text();
     if (file.name.endsWith(".json")) {
       const data = JSON.parse(text);
-      if (!Array.isArray(data)) {
+      if (!validateJsonRecords(data)) {
         showToast(toastEl, "JSON should be an array of records");
         return;
       }

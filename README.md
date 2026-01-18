@@ -32,5 +32,19 @@ python -m http.server
 3. ページを再読み込みして動作確認します。
 4. ネットワークを戻し、Offline/PWA タブで「Check for update」を押します。
 
+## Testing
+ローカルでテストを実行する前に依存関係をインストールします。
+
+```bash
+npm install
+```
+
+Lint とユニットテストは以下で実行できます。
+
+```bash
+npm run lint
+npm test
+```
+
 ## バックエンド不要・外部依存なし
 このプロジェクトは HTML / CSS / JavaScript のみで構成され、すべてのデータはブラウザ内に保存されます。データビューアやメディア編集も、ファイルをアップロードせずにローカルで処理されます。

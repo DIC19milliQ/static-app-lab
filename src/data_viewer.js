@@ -1,58 +1,4 @@
-const parseCsvLine = (line) => {
-  const result = [];
-  let current = "";
-  let inQuotes = false;
-  for (let i = 0; i < line.length; i += 1) {
-    const char = line[i];
-    if (char === '"') {
-      if (inQuotes && line[i + 1] === '"') {
-        current += '"';
-        i += 1;
-      } else {
-        inQuotes = !inQuotes;
-      }
-      continue;
-    }
-    if (char === "," && !inQuotes) {
-      result.push(current);
-      current = "";
-      continue;
-    }
-    current += char;
-  }
-  result.push(current);
-  return result;
-};
-
-const parseCsv = (text) => {
-  const lines = text.split(/\r?\n/).filter((line) => line.trim() !== "");
-  if (lines.length === 0) return [];
-  const headers = parseCsvLine(lines[0]).map((header) => header.trim());
-  return lines.slice(1).map((line) => {
-    const values = parseCsvLine(line);
-    const row = {};
-    headers.forEach((header, index) => {
-      row[header] = values[index] ?? "";
-    });
-    return row;
-  });
-};
-
-const escapeCsv = (value) => {
-  const stringValue = value === null || value === undefined ? "" : String(value);
-  if (/[",\n]/.test(stringValue)) {
-    return `"${stringValue.replace(/"/g, '""')}"`;
-  }
-  return stringValue;
-};
-
-const toCsv = (rows, columns) => {
-  const headerLine = columns.map(escapeCsv).join(",");
-  const bodyLines = rows.map((row) =>
-    columns.map((column) => escapeCsv(row[column])).join(",")
-  );
-  return [headerLine, ...bodyLines].join("\n");
-};
+import { parseCsv, serializeJson, toCsv, validateJsonRecords } from "./data_helpers.js";
 
 const downloadBlob = (blob, filename) => {
   const url = URL.createObjectURL(blob);
@@ -203,7 +149,7 @@ export const initDataViewer = () => {
     if (file.name.endsWith(".json")) {
       try {
         const parsed = JSON.parse(text);
-        if (Array.isArray(parsed)) {
+        if (validateJsonRecords(parsed)) {
           rows = parsed;
         }
       } catch {
@@ -251,7 +197,7 @@ export const initDataViewer = () => {
         return acc;
       }, {});
     });
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const blob = new Blob([serializeJson(data)], { type: "application/json" });
     downloadBlob(blob, "data-view.json");
   });
 
